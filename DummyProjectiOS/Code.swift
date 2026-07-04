@@ -1,3 +1,11 @@
+//
+//  Code.swift
+//  DummyProjectiOS
+//
+//  Created by ashutosh ojha on 04/07/26.
+//
+
+
 import SwiftUICore
 
 struct Code {
@@ -16,6 +24,10 @@ struct Code {
         for index in pegChoices.indices{
             pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
         }
+    }
+    
+    mutating func reset(){
+        pegs = Array(repeating:Code.missingPeg, count: 4)
     }
     
     var matches :[Match]?{
