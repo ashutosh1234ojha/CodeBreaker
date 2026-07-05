@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     //MARK: Data owned by me
-    @State  var game = CodeBreaker(pegChocies: [.brown,.yellow,.orange,.black])
+    @State  var game = CodeBreaker(pegChocies: [.brown,.yellow,.orange,.black,.green])
     @State private var selection:Int = 0
 
     //MARK: -Body
@@ -17,16 +17,19 @@ struct CodeBreakerView: View {
     var body: some View {
         
         VStack {
-        
+            
             view(for: game.masterCode)
             ScrollView{
                 view(for: game.guess)
                 ForEach(game.attempts.reversed().indices,id:\.self){index in
                     view(for: game.attempts[index])
                     
-                        }
+                }
             }
-            pegChooser
+            PegChooser(choices: game.pegChocies, onChoose: {peg in
+                game.setGuessPeg(peg, at: selection)
+                selection =  (selection+1) % game.masterCode.pegs.count
+            }).padding()
         }.padding()
         
     }
@@ -42,37 +45,12 @@ struct CodeBreakerView: View {
             .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
-    var pegChooser: some View {
-        HStack{
-            ForEach(game.pegChocies, id: \.self){peg in
-                Button{
-                    game.setGuessPeg(peg, at: selection)
-                    selection =  (selection+1) % game.masterCode.pegs.count
-                    
-                } label: {
-                    PegView(peg: peg)
-                }
-            }
-        }
-    }
+  
     
     
     func view(for code:Code) -> some View {
             HStack{
-                ForEach(code.pegs.indices,id:\.self){index in
-               
-                  PegView(peg: code.pegs[index])
-                        .background{
-                            if selection == index, code.kind == .guess{
-                                Selection.shape.foregroundStyle(Selection.color)
-                            }
-                        }
-                        .onTapGesture {
-                        if code.kind ==  .guess{
-                           selection = index
-                        }
-                    }
-            }
+                CodeView(code:code, selection: $selection)
                 Rectangle().foregroundStyle(Color.clear).aspectRatio(1,contentMode:.fit).overlay{
                     if let matches = code.matches{
                         MatchMarkers(matches: matches)
@@ -96,12 +74,7 @@ struct CodeBreakerView: View {
         static let scaleFactor:CGFloat = minFontSize/maxFontSize
     }
     
-    struct Selection{
-        static let cornerRadius:CGFloat = 10
-        static let color:Color = Color.gray(0.85)
-        static let shape = RoundedRectangle(cornerRadius: cornerRadius)
-
-    }
+   
 }
 
 
