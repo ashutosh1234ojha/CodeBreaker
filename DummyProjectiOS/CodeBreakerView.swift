@@ -38,8 +38,8 @@ struct CodeBreakerView: View {
                 game.attemptGuess()
             }
             
-        }.font(.system(size:80))
-            .minimumScaleFactor(0.1)
+        }.font(.system(size:GuessButton.maxFontSize))
+            .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
     var pegChooser: some View {
@@ -47,6 +47,7 @@ struct CodeBreakerView: View {
             ForEach(game.pegChocies, id: \.self){peg in
                 Button{
                     game.setGuessPeg(peg, at: selection)
+                    selection =  (selection+1) % game.masterCode.pegs.count
                     
                 } label: {
                     PegView(peg: peg)
@@ -63,7 +64,7 @@ struct CodeBreakerView: View {
                   PegView(peg: code.pegs[index])
                         .background{
                             if selection == index, code.kind == .guess{
-                                RoundedRectangle(cornerRadius: 10).foregroundStyle(Color.gray(0.85))
+                                Selection.shape.foregroundStyle(Selection.color)
                             }
                         }
                         .onTapGesture {
@@ -86,6 +87,20 @@ struct CodeBreakerView: View {
               
           
         }
+        
+    }
+    
+    struct GuessButton{
+        static let minFontSize:CGFloat = 8
+        static let maxFontSize:CGFloat = 80
+        static let scaleFactor:CGFloat = minFontSize/maxFontSize
+    }
+    
+    struct Selection{
+        static let cornerRadius:CGFloat = 10
+        static let color:Color = Color.gray(0.85)
+        static let shape = RoundedRectangle(cornerRadius: cornerRadius)
+
     }
 }
 
