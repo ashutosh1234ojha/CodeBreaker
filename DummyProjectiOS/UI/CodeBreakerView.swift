@@ -18,15 +18,19 @@ struct CodeBreakerView: View {
         
         VStack {
             
-            view(for: game.masterCode)
+            CodeView(code: game.masterCode,ancillaryView: {Text("0:03").font(.title)})
             ScrollView{
                 if !game.isOver
                 {
-                    view(for: game.guess)
+                    CodeView(code: game.guess,selection: $selection){guessButton}
                 }
                     
                 ForEach(game.attempts.reversed().indices,id:\.self){index in
-                    view(for: game.attempts[index])
+                    CodeView(code: game.attempts[index]){
+                        if let matches = game.attempts[index].matches{
+                            MatchMarkers(matches: matches)
+                        }
+                    }
                     
                 }
             }
@@ -50,28 +54,6 @@ struct CodeBreakerView: View {
             .minimumScaleFactor(GuessButton.scaleFactor)
     }
     
-  
-    
-    
-    func view(for code:Code) -> some View {
-            HStack{
-                CodeView(code:code, selection: $selection)
-                Rectangle().foregroundStyle(Color.clear).aspectRatio(1,contentMode:.fit).overlay{
-                    if let matches = code.matches{
-                        MatchMarkers(matches: matches)
-                    }else{
-                        if code.kind == .guess{
-                            guessButton
-                        }
-                    }
-                }
-            
-               
-              
-          
-        }
-        
-    }
     
     struct GuessButton{
         static let minFontSize:CGFloat = 8
